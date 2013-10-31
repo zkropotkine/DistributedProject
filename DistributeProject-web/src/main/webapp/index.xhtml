@@ -10,16 +10,61 @@
         <title>Facelet Title</title>
     </h:head>
     <h:body>
-        Hello from Facelets@@
-        
-        <h:form>  
-            <p:growl id="messages" showDetail="true" life="2000" />  
-            <p:gmap center="41.381542, 2.122893" zoom="15" type="ROADMAP" style="width:600px;height:400px">  
-                <p:ajax event="stateChange" listener="#{mapController.onStateChange}" update="messages" />  
-                <p:ajax event="pointSelect" listener="#{mapController.onPointSelect}" update="messages" />  
-            </p:gmap>  
-        </h:form>  
+        <h:form prependId="false"> 
+            <p:growl id="messages" showDetail="true" />
+            <p:gmap center="41.381542, 2.122893" zoom="15" type="ROADMAP" style="width:600px;height:400px"
+                    model="#{mapController.markerModel}" onPointClick="handlePointClick(event);" widgetVar="map" >
+                <p:ajax event="stateChange" listener="#{mapController.onStateChange}" update="messages" />
+                <p:ajax event="pointSelect" listener="#{mapController.onPointSelect}" update="messages" />
+            </p:gmap>
+           <p:dialog widgetVar="dlg" showEffect="fade">  
+                    <h:panelGrid columns="2">  
+                        <h:outputLabel for="title" value="Title:" />  
+                        <p:inputText id="title" value="#{mapController.title}" />  
+
+                        <f:facet name="footer">  
+                            <p:commandButton value="Add"   
+                                    actionListener="#{mapController.addMarker}"   
+                                    update="messages"   
+                                    oncomplete="markerAddComplete()"/>  
+                            <p:commandButton value="Cancel" onclick="return cancel()"/>  
+                        </f:facet>  
+                    </h:panelGrid>  
+
+                    <h:inputHidden id="lat" value="#{mapController.lat}" />  
+                    <h:inputHidden id="lng" value="#{mapController.lng}" />  
+            </p:dialog>  
+        </h:form>
+        <script type="text/javascript">  
+            var currentMarker = null;  
+
+            function handlePointClick(event) {  
+                if(currentMarker === null) {  
+                    document.getElementById('lat').value = event.latLng.lat();  
+                    document.getElementById('lng').value = event.latLng.lng();  
+                    currentMarker = new google.maps.Marker({  
+                        position:new google.maps.LatLng(event.latLng.lat(), event.latLng.lng())  
+                    });  
+                    map.addOverlay(currentMarker);  
+                    dlg.show();  
+                }     
+            }  
+
+            function markerAddComplete() {  
+                var title = document.getElementById('title');  
+                currentMarker.setTitle(title.value);  
+                title.value = "";  
+                currentMarker = null;  
+                dlg.hide();  
+            }  
+
+            function cancel() {  
+                dlg.hide();  
+                currentMarker.setMap(null);  
+                currentMarker = null;  
+                return false;  
+            }  
+        </script>  
      </h:body>
-    
 </html>
 
