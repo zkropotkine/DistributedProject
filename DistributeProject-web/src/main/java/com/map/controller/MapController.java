@@ -9,6 +9,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import org.primefaces.event.map.MarkerDragEvent;
 import org.primefaces.event.map.PointSelectEvent;
 import org.primefaces.event.map.StateChangeEvent;
 import org.primefaces.model.map.DefaultMapModel;
@@ -50,9 +51,14 @@ public class MapController implements Serializable  {
     
     public void addMarker(ActionEvent actionEvent) {  
         Marker marker = new Marker(new LatLng(lat, lng), title);  
-        markerModel.addOverlay(marker);  
-          
+        markerModel.addOverlay(marker);
+        marker.setDraggable(true);
         addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "Marker Added", "Lat:" + lat + ", Lng:" + lng));  
+    }  
+    
+    public void onMarkerDrag(MarkerDragEvent event) {  
+        Marker marker = event.getMarker();  
+        addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "Marker Dragged", "Lat:" + marker.getLatlng().getLat() + ", Lng:" + marker.getLatlng().getLng()));  
     }  
       
     public void addMessage(FacesMessage message) {  

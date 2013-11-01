@@ -12,10 +12,11 @@
     <h:body>
         <h:form prependId="false"> 
             <p:growl id="messages" showDetail="true" />
-            <p:gmap center="41.381542, 2.122893" zoom="15" type="ROADMAP" style="width:600px;height:400px"
+            <p:gmap id="gmap" center="41.381542, 2.122893" zoom="15" type="ROADMAP" style="width:600px;height:400px"
                     model="#{mapController.markerModel}" onPointClick="handlePointClick(event);" widgetVar="map" >
                 <p:ajax event="stateChange" listener="#{mapController.onStateChange}" update="messages" />
                 <p:ajax event="pointSelect" listener="#{mapController.onPointSelect}" update="messages" />
+                <p:ajax event="markerDrag" listener="#{mapController.onMarkerDrag}" update="messages" />  
             </p:gmap>
            <p:dialog widgetVar="dlg" showEffect="fade">  
                     <h:panelGrid columns="2">  
@@ -25,7 +26,7 @@
                         <f:facet name="footer">  
                             <p:commandButton value="Add"   
                                     actionListener="#{mapController.addMarker}"   
-                                    update="messages"   
+                                    update="messages, gmap"   
                                     oncomplete="markerAddComplete()"/>  
                             <p:commandButton value="Cancel" onclick="return cancel()"/>  
                         </f:facet>  
@@ -53,6 +54,7 @@
             function markerAddComplete() {  
                 var title = document.getElementById('title');  
                 currentMarker.setTitle(title.value);  
+                currentMarker.
                 title.value = "";  
                 currentMarker = null;  
                 dlg.hide();  
