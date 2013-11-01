@@ -44,9 +44,9 @@
                     document.getElementById('lat').value = event.latLng.lat();  
                     document.getElementById('lng').value = event.latLng.lng();  
                     currentMarker = new google.maps.Marker({  
-                        position:new google.maps.LatLng(event.latLng.lat(), event.latLng.lng())  
+                        position:new google.maps.LatLng(event.latLng.lat(), event.latLng.lng()),
+                        draggable:true
                     }); 
-                     
                     document.getElementById('title').value = ""; 
                     map.addOverlay(currentMarker);  
                     dlg.show();  
@@ -55,7 +55,6 @@
 
             function markerAddComplete() {  
                 var title = document.getElementById('title');  
-                alert(title.value);
                 currentMarker.setTitle(title.value);  
                 currentMarker.
                 title.value = "";  
