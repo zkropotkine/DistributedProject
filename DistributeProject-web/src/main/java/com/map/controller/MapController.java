@@ -4,6 +4,9 @@
  */
 package com.map.controller;
 
+import com.notnoop.apns.APNS;
+import com.notnoop.apns.ApnsService;
+import com.notnoop.apns.ApnsServiceBuilder;
 import java.io.Serializable;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -28,11 +31,24 @@ public class MapController implements Serializable  {
     private double lat;  
     private double lng;  
     private String title;
+    private ApnsService service;
     
     public MapController() {  
         markerModel = new DefaultMapModel();  
+        
+        ApnsServiceBuilder apnsServiceBuilder = APNS.newService();
+        apnsServiceBuilder.withCert("/path/to/my/cert", "password");
+        apnsServiceBuilder.withSandboxDestination();
+        
+        service = apnsServiceBuilder.build();        
     }  
       
+    public void pushMSG(String msg) {
+        String payload = APNS.newPayload().alertBody(msg).build();
+        String token = "deviceToken";
+        service.push(token, payload);
+    }
+    
     public void onStateChange(StateChangeEvent event) {  
         LatLngBounds bounds = event.getBounds();  
         int zoomLevel = event.getZoomLevel();  
