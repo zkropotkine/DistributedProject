@@ -6,7 +6,7 @@ package com.map.controller;
 
 import com.notnoop.apns.APNS;
 import com.notnoop.apns.ApnsService;
-import com.notnoop.apns.ApnsServiceBuilder;
+import java.io.InputStream;
 import java.io.Serializable;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -27,6 +27,7 @@ import org.primefaces.model.map.Marker;
  */
 @ManagedBean
 public class MapController implements Serializable  {
+    public static final String CERTIFICATE_PASSWORD = "dani3l";
     private MapModel markerModel; 
     private double lat;  
     private double lng;  
@@ -36,16 +37,18 @@ public class MapController implements Serializable  {
     public MapController() {  
         markerModel = new DefaultMapModel();  
         
-        ApnsServiceBuilder apnsServiceBuilder = APNS.newService();
-        apnsServiceBuilder.withCert("/path/to/my/cert", "password");
-        apnsServiceBuilder.withSandboxDestination();
+        // TODO Remove when the call to the APNS is ready.
+        String url = getClass().getResource("/certificates/distribuyeme.p12").getPath();
+        System.out.println(url);
         
-        service = apnsServiceBuilder.build();        
+        // Build the APNS Service.
+        InputStream certificateStream = getClass().getResourceAsStream("/certificates/distribuyeme.p12");
+        service = APNS.newService().withCert(certificateStream, CERTIFICATE_PASSWORD).withSandboxDestination().build();
     }  
       
     public void pushMSG(String msg) {
         String payload = APNS.newPayload().alertBody(msg).build();
-        String token = "deviceToken";
+        String token = "distribuyeme";
         service.push(token, payload);
     }
     
