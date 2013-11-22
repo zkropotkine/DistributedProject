@@ -57,17 +57,21 @@ public class MapController implements Serializable  {
         }  
         
         // TODO Remove when the call to the APNS is ready.
-        String url = getClass().getResource("/certificates/distribuyeme.p12").getPath();
+        String url = getClass().getResource("/certificates/iphone_dev.p12").getPath();
         System.out.println(url);
         
         // Build the APNS Service.
-        InputStream certificateStream = getClass().getResourceAsStream("/certificates/distribuyeme.p12");
+        InputStream certificateStream = getClass().getResourceAsStream("/certificates/iphone_dev.p12");
         service = APNS.newService().withCert(certificateStream, CERTIFICATE_PASSWORD).withSandboxDestination().build();
+        
+        
+        pushMSG("Joder Funciona 2");
     }  
       
     public void pushMSG(String msg) {
+        System.out.println("msg: " + msg);
         String payload = APNS.newPayload().alertBody(msg).build();
-        String token = "distribuyeme";
+        String token = "43FA3C3684D52B187F08122C4FA204F34A4DDA48DA72CF41353C9D4E0C568ACC";
         service.push(token, payload);
     }
     
