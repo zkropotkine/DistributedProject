@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import org.primefaces.event.map.MarkerDragEvent;
@@ -26,16 +27,34 @@ import org.primefaces.model.map.Marker;
  * @author citlalig
  */
 @ManagedBean
+@ViewScoped
 public class MapController implements Serializable  {
     public static final String CERTIFICATE_PASSWORD = "dani3l";
     private MapModel markerModel; 
-    private double lat;  
-    private double lng;  
+    private double latA = 20.69484572250378;  
+    private double lngA = -103.45468607149087;
+    private double latB = 20.62256524328231;  
+    private double lngB = -103.32113352022134; 
     private String title;
     private ApnsService service;
     
+    //Lat:20.69484572250378, Lng:-103.45468607149087
+    //Lat:20.62256524328231, Lng:-103.32113352022134
+    
     public MapController() {  
         markerModel = new DefaultMapModel();  
+        
+        //Shared coordinates  
+        LatLng coord1 = new LatLng(latA,lngA );  
+        LatLng coord2 = new LatLng(latB, lngB );  
+          
+        //Draggable  
+        markerModel.addOverlay(new Marker(coord1, "A"));  
+        markerModel.addOverlay(new Marker(coord2, "B"));  
+          
+        for(Marker marker : markerModel.getMarkers()) {  
+            marker.setDraggable(true);  
+        }  
         
         // TODO Remove when the call to the APNS is ready.
         String url = getClass().getResource("/certificates/distribuyeme.p12").getPath();
@@ -52,7 +71,7 @@ public class MapController implements Serializable  {
         service.push(token, payload);
     }
     
-    public void onStateChange(StateChangeEvent event) {  
+   /* public void onStateChange(StateChangeEvent event) {  
         LatLngBounds bounds = event.getBounds();  
         int zoomLevel = event.getZoomLevel();  
           
@@ -60,7 +79,7 @@ public class MapController implements Serializable  {
         addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "Center", event.getCenter().toString()));  
         addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "NorthEast", bounds.getNorthEast().toString()));  
         addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "SouthWest", bounds.getSouthWest().toString()));  
-    }  
+    }*/  
       
     public void onPointSelect(PointSelectEvent event) {  
         LatLng latlng = event.getLatLng();  
@@ -68,15 +87,24 @@ public class MapController implements Serializable  {
         addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "Point Selected", "Lat:" + latlng.getLat() + ", Lng:" + latlng.getLng()));  
     }  
     
-    public void addMarker(ActionEvent actionEvent) {  
-        Marker marker = new Marker(new LatLng(lat, lng), title);  
+   public void addMarker(ActionEvent actionEvent) {  
+   /*     Marker marker = new Marker(new LatLng(lat, lng), title);  
         markerModel.addOverlay(marker);
         marker.setDraggable(true);
-        addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "Marker Added", "Lat:" + lat + ", Lng:" + lng));  
+        addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "Marker Added", "Lat:" + lat + ", Lng:" + lng));
+     */
     }  
     
     public void onMarkerDrag(MarkerDragEvent event) {  
-        Marker marker = event.getMarker();  
+        Marker marker = event.getMarker(); 
+        if(marker.getTitle().equals("A")){
+            this.setLatA(marker.getLatlng().getLat());
+            this.setLngA(marker.getLatlng().getLng());
+        }
+        else if (marker.getTitle().equals("B")){
+            this.setLatB(marker.getLatlng().getLat());
+            this.setLngB(marker.getLatlng().getLng());
+        }
         addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "Marker Dragged", "Lat:" + marker.getLatlng().getLat() + ", Lng:" + marker.getLatlng().getLng()));  
     }  
       
@@ -99,34 +127,6 @@ public class MapController implements Serializable  {
     }
 
     /**
-     * @return the lat
-     */
-    public double getLat() {
-        return lat;
-    }
-
-    /**
-     * @param lat the lat to set
-     */
-    public void setLat(double lat) {
-        this.lat = lat;
-    }
-
-    /**
-     * @return the lng
-     */
-    public double getLng() {
-        return lng;
-    }
-
-    /**
-     * @param lng the lng to set
-     */
-    public void setLng(double lng) {
-        this.lng = lng;
-    }
-
-    /**
      * @return the title
      */
     public String getTitle() {
@@ -138,5 +138,61 @@ public class MapController implements Serializable  {
      */
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    /**
+     * @return the latA
+     */
+    public double getLatA() {
+        return latA;
+    }
+
+    /**
+     * @param latA the latA to set
+     */
+    public void setLatA(double latA) {
+        this.latA = latA;
+    }
+
+    /**
+     * @return the lngA
+     */
+    public double getLngA() {
+        return lngA;
+    }
+
+    /**
+     * @param lngA the lngA to set
+     */
+    public void setLngA(double lngA) {
+        this.lngA = lngA;
+    }
+
+    /**
+     * @return the latB
+     */
+    public double getLatB() {
+        return latB;
+    }
+
+    /**
+     * @param latB the latB to set
+     */
+    public void setLatB(double latB) {
+        this.latB = latB;
+    }
+
+    /**
+     * @return the lngB
+     */
+    public double getLngB() {
+        return lngB;
+    }
+
+    /**
+     * @param lngB the lngB to set
+     */
+    public void setLngB(double lngB) {
+        this.lngB = lngB;
     }
 }
