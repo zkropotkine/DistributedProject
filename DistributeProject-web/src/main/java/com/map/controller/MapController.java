@@ -65,7 +65,7 @@ public class MapController implements Serializable  {
         service = APNS.newService().withCert(certificateStream, CERTIFICATE_PASSWORD).withSandboxDestination().build();
         
         
-        pushMSG("La app esta empezando");
+        //pushMSG("La app esta empezando");
     }  
       
     public void pushMSG(String msg) {
