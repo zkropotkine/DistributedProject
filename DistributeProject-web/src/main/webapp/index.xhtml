@@ -55,21 +55,21 @@
                         <p:growl id="messages" showDetail="true" />
                         <h:panelGrid columns="6" id="panel" >
                             <h:outputText value="A:"/>
-                            <p:inputText styleClass="latstart" value="#{mapController.latA}"/>  
-                            <p:inputText styleClass="lngstart" value="#{mapController.lngA}"/> 
+                            <p:inputText id="latstart" value="#{mapController.latA}"/>  
+                            <p:inputText id="lngstart" value="#{mapController.lngA}"/> 
 
                             <h:outputText value="B:"/>
-                            <p:inputText styleClass="latend" value="#{mapController.latB}"/>  
-                            <p:inputText styleClass="lngend" value="#{mapController.lngB}"/> 
+                            <p:inputText id="latend" value="#{mapController.latB}"/>  
+                            <p:inputText id="lngend" value="#{mapController.lngB}"/> 
                         </h:panelGrid>
 
                         <p:commandButton value="Calcular Ruta" 
                                          type="button"                                                       
-                                         onclick="calcRoute()"
-                                         update="gmap"/>  
+                                         onclick="calcRoute()"/> 
+                                          
                         
-                        <p:gmap id="gmap" center="20.661542, -103.352893" zoom="12" type="ROADMAP" style="width:900px;height:500px;margin-left:8px;margin-top:8px "
-                                model="#{mapController.markerModel}" widgetVar="wmap" >
+                        <p:gmap center="20.661542, -103.352893" zoom="12" type="ROADMAP" style="width:900px;height:500px;margin-left:8px;margin-top:8px "
+                                model="#{mapController.markerModel}" widgetVar="wmap" fitBounds="true">
                             <p:ajax event="pointSelect" listener="#{mapController.onPointSelect}" update="messages" />
                             <p:ajax event="markerDrag" listener="#{mapController.onMarkerDrag}" update="messages, panel" />  
                         </p:gmap>
@@ -83,33 +83,45 @@
 
         </p:layout>
         <script type="text/javascript">
-            
-            function calcRoute() {        
-                map = wmap.getMap();
-                var directionsService = new google.maps.DirectionsService(); 
-                var rendererOptions = {
-                  map: map
-                }
-                var directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);
-                var latlngstart = new google.maps.LatLng($('.latstart').val(),$('.lngstart').val());                
-                var latlngsend = new google.maps.LatLng($('.latend').val(),$('.lngend').val());  
-                directionsDisplay.setMap(map);
-                var dp = document.getElementById("directionsPanel");
-                dp.innerHTML = '';
-                directionsDisplay.setPanel(dp);                                         
+            var directionsDisplay;
+            var directionsService = new google.maps.DirectionsService();
+            var map;
 
+            function initialize() {
+               var rendererOptions = {
+                draggable: true
+              };
+              directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);
+              var guadalajara = new google.maps.LatLng(20.661542, -103.352893);
+              var mapOptions = {
+                zoom:12,
+                center: guadalajara
+              }
+              map = wmap.getMap();
+              directionsDisplay.setMap(map);
+              
+              google.maps.event.addListener(directionsDisplay, 'directions_changed', function() {
+                alert("directions changed");
+              });
+              calcRoute();
+            }
+
+            function calcRoute() {
+                
+                var start = new google.maps.LatLng(document.getElementById('latstart').value,document.getElementById('lngstart').value);  
+                var end = new google.maps.LatLng(document.getElementById('latend').value,document.getElementById('lngend').value);  
                 var request = {
-                    origin:latlngstart,
-                    destination:latlngsend,
-                    travelMode: google.maps.TravelMode.DRIVING
+                  origin:start,
+                  destination:end,
+                  travelMode: google.maps.TravelMode.DRIVING
                 };
                 directionsService.route(request, function(response, status) {
-                    if (status === google.maps.DirectionsStatus.OK) {
-                        directionsDisplay.setDirections(response);
+                  if (status == google.maps.DirectionsStatus.OK) {
+                    directionsDisplay.setDirections(response);
                     }
                 });
-            }                  
-            
+            }
+            google.maps.event.addDomListener(window, 'load', initialize);    
         </script>  
     </h:body>
 </html>
