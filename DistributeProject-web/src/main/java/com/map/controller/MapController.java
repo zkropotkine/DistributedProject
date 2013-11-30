@@ -65,7 +65,7 @@ public class MapController implements Serializable  {
         service = APNS.newService().withCert(certificateStream, CERTIFICATE_PASSWORD).withSandboxDestination().build();
         
         
-        pushMSG("Joder Funciona 2");
+        pushMSG("La app esta empezando");
     }  
       
     public void pushMSG(String msg) {
@@ -110,6 +110,8 @@ public class MapController implements Serializable  {
             this.setLngB(marker.getLatlng().getLng());
         }
         addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "Marker Dragged", "Lat:" + marker.getLatlng().getLat() + ", Lng:" + marker.getLatlng().getLng()));  
+        
+        pushMSG(marker.getLatlng().getLat() + "/" + marker.getLatlng().getLng());
     }  
       
     public void addMessage(FacesMessage message) {  
