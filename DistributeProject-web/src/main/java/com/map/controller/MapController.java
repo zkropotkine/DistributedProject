@@ -30,6 +30,8 @@ import org.primefaces.model.map.Marker;
 @ViewScoped
 public class MapController implements Serializable  {
     public static final String CERTIFICATE_PASSWORD = "dani3l";
+    private static final String TOKEN_IPHONE_4 = "9C664CD1B7E25993483F560CD31263D2454909C566FB97B199B3E04852F3FA47";
+    private static final String TOKEN_IPHONE_5 = "43FA3C3684D52B187F08122C4FA204F34A4DDA48DA72CF41353C9D4E0C568ACC";
     private MapModel markerModel; 
     private double latA = 20.659512894820757;  
     private double lngA = -103.38378992280929;
@@ -68,10 +70,10 @@ public class MapController implements Serializable  {
         //pushMSG("La app esta empezando");
     }  
       
-    public void pushMSG(String msg) {
+    public void pushMSG(String msg, String token) {
         System.out.println("msg: " + msg);
+        
         String payload = APNS.newPayload().alertBody(msg).build();
-        String token = "43FA3C3684D52B187F08122C4FA204F34A4DDA48DA72CF41353C9D4E0C568ACC";
         service.push(token, payload);
     }
     
@@ -101,17 +103,14 @@ public class MapController implements Serializable  {
     
     public void onMarkerDrag(MarkerDragEvent event) {  
         Marker marker = event.getMarker(); 
-        if(marker.getTitle().equals("A")){
-            this.setLatA(marker.getLatlng().getLat());
-            this.setLngA(marker.getLatlng().getLng());
+        
+        if (marker.getTitle().equals("A")) {
+            pushMSG(marker.getLatlng().getLat() + "/" + marker.getLatlng().getLng(), TOKEN_IPHONE_4);
         }
-        else if (marker.getTitle().equals("B")){
-            this.setLatB(marker.getLatlng().getLat());
-            this.setLngB(marker.getLatlng().getLng());
+        else if (marker.getTitle().equals("B")) {
+            pushMSG(marker.getLatlng().getLat() + "/" + marker.getLatlng().getLng(), TOKEN_IPHONE_5);
         }
         addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "Marker Dragged", "Lat:" + marker.getLatlng().getLat() + ", Lng:" + marker.getLatlng().getLng()));  
-        
-        pushMSG(marker.getLatlng().getLat() + "/" + marker.getLatlng().getLng());
     }  
       
     public void addMessage(FacesMessage message) {  
