@@ -10,6 +10,7 @@
         type="text/javascript"></script>
     </h:head>
     <h:body>
+        <h:form prependId="false"> 
         <p:layout id="layout" fullPage="true">  
 
             <p:layoutUnit position="north" style="border: white">  
@@ -21,27 +22,24 @@
                 </div>  
             </p:layoutUnit>  
 
-            <p:layoutUnit position="west" style="border: white" size="250">  
+            <p:layoutUnit position="west" style="border: white" size="350">  
                 <p:panel header="Rutas Disponibles" style="border: white">
-                    <p:accordionPanel multiple="false">  
-                        <p:tab title="Ruta 1">  
-                            <h:panelGrid columns="1" cellpadding="10">  
-                                <h:outputText value="Mostrar Ruta" />  
-                                <h:outputText value="Ocultar Ruta" /> 
-                                <h:outputText value="Subscribirse" />
-                            </h:panelGrid>  
+                    <p:accordionPanel id="rutas" multiple="true"> 
+                        <!--p:ajax event="tabChange" oncomplete="handleOncomplete(xhr, status, args)"/-->  
+                        <p:tab  title="Ruta 1">  
+                            <h:panelGrid columns="2" cellpadding="5" id="panel1">  
+                                <h:outputText value="Lat:"/>
+                                <h:outputText id="latstart" value="#{mapController.latA}"/> 
+                                <h:outputText value="Long:"/>
+                                <h:outputText id="lngstart" value="#{mapController.lngA}"/> 
+                           </h:panelGrid>
                         </p:tab>  
                         <p:tab title="Ruta 2">  
-                            <h:panelGrid columns="1" cellpadding="10">  
-                                <h:outputText value="Mostrar Ruta" />  
-                                <h:outputText value="Ocultar Ruta" /> 
-                                <h:outputText value="Subscribirse" />
-                            </h:panelGrid>  
-                        </p:tab>  
-                        <p:tab title="Todas las Rutas">  
-                            <h:panelGrid columns="1" cellpadding="10">  
-                                <h:outputText value="Mostrar Rutas" />  
-                                <h:outputText value="Ocultar Rutas" />                                
+                            <h:panelGrid columns="2" cellpadding="5" id="panel2">  
+                                <h:outputText value="Lat:"/>
+                                <h:outputText id="latend" value="#{mapController.latB}"/>  
+                                <h:outputText value="Long:"/>
+                                <h:outputText id="lngend" value="#{mapController.lngB}"/> 
                             </h:panelGrid>  
                         </p:tab>  
                     </p:accordionPanel>  
@@ -49,41 +47,22 @@
             </p:layoutUnit>  
 
             <p:layoutUnit position="center" style="border: white">  
-
                 <p:panel header="Mapa de Rutas" style="border: white;margin-right:75px">  
-                    <h:form prependId="false">  
                         <p:growl id="messages" showDetail="true" />
-                        <h:panelGrid columns="6" id="panel" >
-                            <h:outputText value="A:"/>
-                            <p:inputText id="latstart" value="#{mapController.latA}"/>  
-                            <p:inputText id="lngstart" value="#{mapController.lngA}"/> 
-
-                            <h:outputText value="B:"/>
-                            <p:inputText id="latend" value="#{mapController.latB}"/>  
-                            <p:inputText id="lngend" value="#{mapController.lngB}"/> 
-                        </h:panelGrid>
-
-                        <p:commandButton value="Calcular Ruta" 
-                                         type="button"                                                       
-                                         onclick="calcRoute()"/> 
-                                          
-                        
                         <p:gmap center="20.661542, -103.352893" zoom="12" type="ROADMAP" style="width:900px;height:500px;margin-left:8px;margin-top:8px "
                                 model="#{mapController.markerModel}" widgetVar="wmap" fitBounds="true">
                             <p:ajax event="pointSelect" listener="#{mapController.onPointSelect}" update="messages" />
-                            <p:ajax event="markerDrag" listener="#{mapController.onMarkerDrag}" update="messages, panel" />  
+                            <p:ajax event="markerDrag" listener="#{mapController.onMarkerDrag}" update="messages, rutas:panel1, rutas:panel2" />  
                         </p:gmap>
-                        
                         <p:outputPanel id="directionsPanel" styleClass="directionsPanel" style="width:600px" layout="block"/> 
-                  
-                    </h:form>
                 </p:panel>
-
             </p:layoutUnit> 
 
         </p:layout>
+        </h:form>
         <script type="text/javascript">
-            var directionsDisplay;
+            var directionsDisplay1;
+            var directionsDisplay2;
             var directionsService = new google.maps.DirectionsService();
             var map;
 
@@ -91,25 +70,27 @@
                var rendererOptions = {
                 draggable: true
               };
-              directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);
-              var guadalajara = new google.maps.LatLng(20.661542, -103.352893);
-              var mapOptions = {
-                zoom:12,
-                center: guadalajara
-              }
+              directionsDisplay1 = new google.maps.DirectionsRenderer(rendererOptions);
+              directionsDisplay2 = new google.maps.DirectionsRenderer(rendererOptions);
               map = wmap.getMap();
-              directionsDisplay.setMap(map);
-              
-              google.maps.event.addListener(directionsDisplay, 'directions_changed', function() {
-                alert("directions changed");
-              });
-              calcRoute();
+              directionsDisplay1.setMap(map);
+              directionsDisplay2.setMap(map);
+              calcRoute(
+                new google.maps.LatLng(20.59814274206707,-103.40438928804366),
+                new google.maps.LatLng(20.6996631980366,-103.35495081148116),
+                directionsDisplay1
+              );
+              calcRoute(
+                new google.maps.LatLng(20.695809229853015,-103.45451441011397),
+                new google.maps.LatLng(20.629312875456062,-103.29521265230147),
+                directionsDisplay2
+              );
             }
 
-            function calcRoute() {
+            function calcRoute(s, e, directionsDisplay) {
                 
-                var start = new google.maps.LatLng(document.getElementById('latstart').value,document.getElementById('lngstart').value);  
-                var end = new google.maps.LatLng(document.getElementById('latend').value,document.getElementById('lngend').value);  
+                var start = s;  
+                var end = e;  
                 var request = {
                   origin:start,
                   destination:end,

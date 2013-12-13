@@ -31,10 +31,10 @@ import org.primefaces.model.map.Marker;
 public class MapController implements Serializable  {
     public static final String CERTIFICATE_PASSWORD = "dani3l";
     private MapModel markerModel; 
-    private double latA = 20.69484572250378;  
-    private double lngA = -103.45468607149087;
-    private double latB = 20.62256524328231;  
-    private double lngB = -103.32113352022134; 
+    private double latA = 20.659512894820757;  
+    private double lngA = -103.38378992280929;
+    private double latB = 20.626260412235876;  
+    private double lngB = -103.38550653657882; 
     private String title;
     private ApnsService service;
     
